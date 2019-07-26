@@ -16,19 +16,25 @@ The [Stat Div Lab](http://statisticaldiversitylab.com/) is a group of badass sta
 The Statistical Diversity Lab is the research group of Amy Willis. The Stat Div Lab develops rigorous statistical methods for the analysis of microbiome data. We are excited to be at STAMPS teaching `Statistics Bootcamp`, and `Statistical Estimation`. We are typically very opinionated, though, so feel free to chat to us about anything!
 
 # Tutorials
-### Corncob Tutorial
+### Corncob Tutorial (R markdown and html file)
 ```
 download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/corncob_tutorial/corncob_tutorial.Rmd", "corncob_tutorial.Rmd")
+
+download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/corncob_tutorial/corncob_tutorial.html", corncob_tutorial.html)
 ```
 
-### Corncob and DESeq2 Tutorial
+### Corncob and DESeq2 Tutorial (R markdown and html file)
 ```
 download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/corncobDESeq2/corncobDESeq2.Rmd", "corncobDESeq2.Rmd")
+
+download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/corncobDESeq2/corncobDESeq2.html", corncobDESeq2.html)
 ```
 
-### Diversity Estimation Tutorial
+### Diversity Estimation Tutorial (R markdown and html file)
 ```
 download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/diversity-lab.Rmd", "diversity-lab.Rmd")
+
+download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/diversity-lab.html", "diversity-lab.html")
 ```
 
 # Questions
