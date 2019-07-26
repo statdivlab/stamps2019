@@ -1,0 +1,261 @@
+---
+title: "Diversity Estimation Lab"
+output: 
+  html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## `breakaway` and `DivNet`
+
+We're going to learn about using `breakaway` and `DivNet` for diversity estimation and comparison!
+
+Let's begin by loading in all the packages we'll need for this tutorial. 
+```{r, message = FALSE, warning = FALSE, echo = TRUE, cache = TRUE}
+library(breakaway)
+library(DivNet)
+library(phyloseq)
+library(tidyverse)
+library(ggplot2)
+```
+
+Let's make sure that `breakaway` and `DivNet` are loaded properly 
+
+```{r, echo = TRUE, cache = TRUE}
+data(apples)
+head(apples)
+```
+
+We are going to use data distributed from `phyloseq` called GlobalPatterns
+```{r, echo = TRUE, cache = TRUE}
+data("GlobalPatterns")
+GlobalPatterns
+``` 
+Here we see that GlobalPatterns is a `phyloseq` object containing an otu table, taxonomy table, sample data, and a phylogenetic tree.  
+
+Let's take a look at the sample data for GlobalPatterns to see some more information about the data we'll be using.
+
+```{r, echo = TRUE, cache = TRUE}
+GlobalPatterns %>% sample_data
+```
+It looks like there are 26 samples and 7 variables to describe those samples. We're particularly interested in looking at only the water samples so we are going to need to subset our samples using the variable SampleType.
+
+```{r, echo = TRUE, cache = TRUE}
+water <- GlobalPatterns %>%
+  subset_samples(SampleType %in% c("Freshwater", 
+                                   "Freshwater (creek)", 
+                                   "Ocean", 
+                                   "Sediment (estuary)"))
+```
+
+We need to decide at which taxonomic level we're interested in understanding diversity. Do we want to know about the diversity of our samples at the Kingdom, Phylum, Class, Order, Family, Genus, or Species level? 
+
+Let's say we're interested in understanding the diversity in our water samples at the Order-level. We can use the `tax_glom()` function in `phyloseq` to summarize our data at the Order-level. 
+
+```{r, echo = TRUE, cache = TRUE}
+water_order <- water %>% tax_glom("Order")
+```
+
+A common goal in microbiome research is to look at the observed richness of our samples. `phyloseq` has some built-in tools for quantifying alpha diversity, but they're not great. They underestimate richness, underestimate uncertainty, and don't allow hypothesis testing. 
+
+Let's take a look at a plot of our observed Order-level richness by SampleType using a built-in `plot` function from `breakaway`. 
+```{r, echo = TRUE, cache = TRUE}
+observed_phyloseq <- sample_richness(water_order)
+plot(observed_phyloseq, water_order, color = "SampleType")
+```
+
+Based on the plot, Freshwater (creek) appears to have the highest observed richness. However, what might be a confounding factor of observed richness? 
+```{r, cache = TRUE, echo = FALSE}
+print("sequencing_depth!")
+```
+
+What might we expect to see if we plotted observed richness of each SampleType by their sequencing depth? 
+
+We can use ggplot and phyloseq to plot our sample types by observed richness and sequencing depth. 
+```{r, cache = TRUE}
+data.frame("observed_richness" = (observed_phyloseq %>% summary)$estimate,
+           "depth" = phyloseq::sample_sums(water_order), # Easter egg! Phyloseq's function to get depth
+           "type" = water_order %>% sample_data %>% get_variable("SampleType")) %>%
+  ggplot(aes(x = depth, y = observed_richness, color = type)) +
+  geom_point()
+```
+
+So what do we see? We see that some of our Freshwater (creek) samples which have the highest observed richness also have the highest sequencing depth and that our Sediment (estuary) samples which have the lowest observed richness also have the lowest sequencing depth. This isn't surprising! So what can we do about this? (hint: NOT rarefaction)
+
+
+## answer: `breakaway`
+
+Instead of randomly subsampling our data so that our samples have some uniform lower sequencing depth (does this seem like a good idea? seems like we might be losing some valuable information by doing this) why don't we use the information that we have to estimate the number of missing species with a species richness estimator. (Statistics is so cool)
+
+We can do that using `breakaway()`.  
+
+```{r, cache=TRUE, warning = FALSE}
+ba <- breakaway(water_order)
+ba 
+plot(ba, water_order, color = "SampleType") -> p1
+plot(observed_phyloseq, water_order, color = "SampleType") -> p2 
+library(gridExtra)
+grid.arrange(p2, p1, nrow = 2)
+```
+
+Here we're comparing our results with the previous plot we generated using `phyloseq`'s observed richness estimator. What looks different? The most obvious is that there are error bars around our estimates of observed order-level richness! Makes sense to have them, right? 
+
+**Thought exercise:** If you were to perform a hypothesis test comparing freshwater (creek) samples vs. sediment observed richnesses using the two different estimators we've investigated (`phyloseq` vs. `breakaway`) what might be the qualitative implications of either approach?  
+
+
+`breakaway` goes through many different models to see which one is best for modeling our data. If you're interested in seeing what `breakaway` chooses to model the richness of a particular sample (in this case let's choose TRRsed3) you can look at that by selecting the sample of interest and `model` output! 
+
+```{r, cache = TRUE}
+ba$TRRsed1$model
+# breakaway choose a Kemp model for TRRsed1. Cool! 
+```
+
+Kemp models work by fitting a logit probabilistic model to a transformation of the data. We can also plot the transformation and the fit if you wanted to have a look. More details about this can be found in the paper: Willis & Bunge (2015), Biometrics)
+
+```{r, cache = TRUE}
+tr <- water_order %>% subset_samples(X.SampleID == "TRRsed1")
+# make a frequency count table of our data 
+fc <- tr %>% otu_table %>% make_frequency_count_table
+# note: So there are 11 singletons (Orders observed once) here
+# Let's fit the breakaway to this sample
+ba_tr <- breakaway(fc)
+ba_tr %>% plot
+```
+
+If you want to flex your ggplotting skillz you can take the estimates and turn them into a dataframe for use in ggplot! 
+
+```{r, cache = TRUE}
+library(tibble)
+summary(ba) %>%
+  add_column("SampleNames" = water_order %>% otu_table %>% sample_names)
+```
+
+`breakaway` also implements lots of species richness estimates. For example, you could the chao-bunge estimator... 
+
+```{r, cache = TRUE, message = FALSE, warning = FALSE}
+water_order %>%
+  chao_bunge %>%
+  plot(water_order, color = "SampleType")
+```
+
+In many cases the absolute number of species isn't as interesting as comparing ecosystems. Let's test the hypothesis that different types of water systems have the same microbial diversity. 
+`betta()` works like a regression model, but it accounts for the uncertainty in estimating diversity. 
+
+```{r, cache = TRUE}
+bt <- betta(summary(ba)$estimate,
+            summary(ba)$error,
+            make_design_matrix(water_order, "SampleType"))
+bt$table
+```
+
+`betta()` estimates that the mean Order-level diversity in Freshwater is 154 orders. It estimates that the diversity in creeks is significantly higher (on average 23 orders) while oceans have significantly lower diversity (on average, 16 orders). However, estuaries do not have significantly different diversity than fresh water sources. **Note** that these estimates account for different sequencing depths! `breakaway` estimates the number of missing species based on the sequence depth and number of rare taxa in the data. 
+
+The citation for `betta()` is Willis, Bunge & Whitman, 2016, JRSS-C
+
+Please use it! It's very important that you account for the error bars in diversity when doing hypothesis testing. `t.test`, `lm()`, `aov()`, `anova()` do not account for this -- `betta()` does!
+
+
+## But what if I want to estimate other diversity metrics? 
+
+Species richness counts all species equally. However, if a species is rare, you may think that it doesn't play a role in the community. Another alpha diversity index, called the Shannon index, works similarly to species richness but it downweights the importance of rare taxa i.e. if a taxon is present but in low abundance, it doesn't count for "1" taxon, but something less (to reflect its low abundance). Since rare taxa may be dubious, the Shannon index is very popular in microbial ecology. 
+
+For the reasons discussed in the statistics lecture, it's important to estimate the Shannon diversity using a valid estimator of the Shannon diversity. It's even more important to come up with the standard error, and use that standard error in testing using `betta()`. 
+
+Shockingly, until recently, there were no tools to estimate Shannon diversity in the presence of an ecological/microbial network! `DivNet` is a new tool that allows you to estimate this. It also adjusts for different sequencing depths so you don't have to throw away any data (you don't need to rarefy)!
+
+Check out the preprint: Willis & Martin (2018+), bioRxiv 305045; doi: https://doi.org/10.1101/305045
+
+DivNet is very flexible, but by default it estimates the microbial network and uses it only to
+adjust the standard errors on diversity estimates. DivNet can be run in parallel! This might take a minute; if it errors, try running it in series (slower but more portable): `dv_water <- divnet(water_order, ncores = 1)`
+```{r, cache = TRUE, message = FALSE, results = 'hide'}
+dv_water_order <- divnet(water_order, ncores = 4)
+```
+
+DivNet outputs a list of the estimates shannon, simpson (alpha diversity), bray-curtis, euclidean (beta diversity)
+```{r, cache = TRUE} 
+dv_water_order %>% names
+```
+You can pull them out individually:
+```{r, cache = TRUE} 
+dv_water_order$shannon %>%
+  summary %>%
+  add_column("SampleNames" = water_order %>% otu_table %>% sample_names)
+```
+or plot them:
+```{r, cache = TRUE}
+plot(dv_water_order$shannon, 
+     water_order, 
+     col = "SampleType")
+```
+
+Let's compare this to the naive approach of just "plugging in" the observed proportions to the Shannon diversity formula
+
+```{r, cache = TRUE}
+plot(water_order %>% sample_shannon, 
+     water_order, 
+     col = "SampleType") + ylim(0, 3.5)
+```
+
+You will notice that the estimates are almost the same as previously, but the error bars differ significantly i.e., **there are error bars**
+
+The error bars were the same as previously because we haven't told DivNet anything about the experimental design. Here we observed 4 different water systems, so we will add this as a covariate
+```{r, cache = TRUE, message = FALSE, warning = FALSE, results = 'hide'} 
+dv_water_st <- divnet(water_order, X = "SampleType", ncores = 8)
+
+plot(dv_water_st$shannon, 
+     water_order, 
+     col = "SampleType")
+``` 
+
+Now we see that organisms in the same group are estimated to have the same diversity. We are now estimating the diversity of this **type** of ecosystem. We're focusing on the ecosystem, not just the samples. If we want to  reproduce the results of our study, it's better to focus on the populations that the samples come from, not the samples themselves
+
+You can analyze sex, time, disease status in this way. It's actually ideal for longitudinal/epigenetic studies, because you can say something about the groups, not just the people/mice in your study
+
+Let's look at hypothesis testing for DivNet
+
+```{r, cache = TRUE, warning = FALSE, message = FALSE}
+testDiversity(dv_water_st, "shannon")
+```
+
+So we have higher Shannon diversity in oceans and estuaries than in freshwater. (This is just a wrapper for `betta()`, btw) 
+
+We can also do the same thing for Simpson, of course:
+```{r, cache = TRUE}
+plot(dv_water_st$simpson, 
+     water_order, 
+     col = "SampleType")
+testDiversity(dv_water_st, "simpson")
+``` 
+
+To test hypotheses about beta diversity using `DivNet`, let's pull out our estimated distance matrix:
+```{r, cache = TRUE} 
+bc <- dv_water_st$`bray-curtis`
+```
+
+You'll notice that all samples with the same SampleType at the same estimate. DivNet uses covariate information to share strength across samples and obtain an estimate about the beta diversity of the **ecosystems** which can be defined as individual samples, groups of samples, etc... 
+
+We can consider the  unique rows using:
+```{r, cache = TRUE}
+bc %>% unique
+``` 
+
+Uniquely, DivNet also has variance estimates:
+```{r, cache = TRUE}
+simplifyBeta(dv_water_st, water_order, "bray-curtis", "SampleType")
+simplifyBeta(dv_water_st, water_order, "euclidean", "SampleType")
+``` 
+
+You can plot this easily:
+```{r, cache = TRUE} 
+simplifyBeta(dv_water_st, water_order, "bray-curtis", "SampleType") %>%
+  ggplot(aes(x = interaction(Covar1, Covar2), 
+             y = beta_est)) +
+  geom_point() +
+  geom_linerange(aes(ymin = lower, ymax = upper)) + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab("") + ylab("Estimates of Bray-Curtis distance")
+```
+
+Finally, a teaser! Soon we will have support for phylodivnet(), to estimate UniFrac in the presence of a network. Subscribe to our github for updates. www.github.com/statdivlab/
