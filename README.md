@@ -4,6 +4,7 @@ Welcome! This repository contains the statdivlab's teaching materials for STAMPS
 
 This repository will continue to be updated until the end of STAMPS. All materials are drafts until August 1.
 
+
 # Who?
 
 The [Stat Div Lab](http://statisticaldiversitylab.com/) is a group of badass statisticians. Your Stat Div Lab representatives at STAMPS in 2019 are:
@@ -13,6 +14,22 @@ The [Stat Div Lab](http://statisticaldiversitylab.com/) is a group of badass sta
 - Pauline Trinh, PhD Candidate, UW Occupational and Environmental Health [@paulinetrinh](https://twitter.com/paulinetrinh)
 
 The Statistical Diversity Lab is the research group of Amy Willis. The Stat Div Lab develops rigorous statistical methods for the analysis of microbiome data. We are excited to be at STAMPS teaching `Statistics Bootcamp`, and `Statistical Estimation`. We are typically very opinionated, though, so feel free to chat to us about anything!
+
+# Tutorials
+### Corncob Tutorial
+```
+download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/corncob_tutorial/corncob_tutorial.Rmd", "corncob_tutorial.Rmd")
+```
+
+### Corncob and DESeq2 Tutorial
+```
+download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/corncobDESeq2/corncobDESeq2.Rmd", "corncobDESeq2.Rmd")
+```
+
+### Diversity Estimation Tutorial
+```
+download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/diversity-lab.Rmd", "diversity-lab.Rmd")
+```
 
 # Questions
 
