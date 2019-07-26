@@ -1,0 +1,114 @@
+---
+title: "corncob and DESeq2"
+author: "Bryan Martin"
+output: html_document
+---
+
+
+For this tutorial we will be comparing differential abundance hypothesis testing results from corncob and DESeq2. I will be using the data and following the tutorial from the DESeq2 tutorial available at [this webpage](https://joey711.github.io/phyloseq-extensions/DESeq2.html).
+
+First, let's load the required packages.
+
+```{r, cache = TRUE, message = FALSE}
+library(corncob)
+library(DESeq2)
+library(phyloseq)
+library(dplyr)
+```
+
+Next, we'll get results from DESeq2, following the tutorial (updating one part which is deprecated at the link above but available in the package vignette). We will be examining and comparing the microbiomes of individuals with and without colorectal cancer. Specifically, we will be testing for differential abundance across all 2505 taxa.
+
+I will re-name the taxa using the corncob function `clean_taxa_names()`. This is just to make the taxa names more human readable. We will use a significance cutoff of 0.05.  
+
+```{r, cache = TRUE, message = FALSE, warning = FALSE, echo = FALSE, results = 'hide'}
+
+kostic <- system.file("extdata",
+                      "study_1457_split_library_seqs_and_mapping.zip",
+                      package="phyloseq") %>% 
+  microbio_me_qiime %>%
+  subset_samples(DIAGNOSIS != "None") %>%
+  corncob::clean_taxa_names(name = "taxon")
+
+diagdds = phyloseq_to_deseq2(kostic, ~ DIAGNOSIS)
+# calculate geometric means prior to estimate size factors
+gm_mean = function(x, na.rm=TRUE){
+  exp(sum(log(x[x > 0]), na.rm=na.rm) / length(x))
+}
+geoMeans = apply(counts(diagdds), 1, gm_mean)
+diagdds = estimateSizeFactors(diagdds, geoMeans = geoMeans)
+diagdds = DESeq(diagdds,test="Wald", fitType="parametric")
+res = results(diagdds, cooksCutoff = FALSE)
+sigtab = res[which(res$padj < 0.05), ]
+sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(kostic)[rownames(sigtab), ], "matrix"))
+```
+
+We can see the results by looking at `sigtab`. Let's look at the first 5 rows. 
+```{r}
+sigtab[1:5,]
+```
+
+We can see the `r nrow(sigtab)` taxa in which DESeq2 identified differential abundance by examining the row names of `sigtab`.
+
+```{r}
+rownames(sigtab)
+```
+
+
+Now we will test the same hypothesis using `corncob`. This framework allows us to control for the effect of diagnosis metadata on the variance of the relative abundances. The details of the syntax of the `corncob` functions are explained in other tutorials, so for the purposes of this tutorial I will just run the code.
+
+```{r, cache = TRUE}
+corn_output <- differentialTest(formula = ~ DIAGNOSIS,
+                                phi.formula = ~ DIAGNOSIS,
+                                formula_null = ~ 1,
+                                phi.formula_null = ~ DIAGNOSIS,
+                                test = "Wald", boot = FALSE,
+                                data = kostic,
+                                fdr_cutoff = 0.05)
+```
+
+We can print out the significant taxa using:
+
+```{r}
+corn_output$significant_taxa
+```
+
+Alternatively, we can display this information graphically with estimates and confidence intervals using `plot`. We will trim the taxonomic labels so the plot does not become too cluttered:
+
+```{r, cache = TRUE}
+plot(corn_output, level = c("Family", "Genus"))
+```
+
+Now, we will examine some of the taxa for which the qualitative results from `corncob` and `DESeq2` differ. Let's examine the taxa that `DESeq2` finds significance and `corncob` does not first.
+
+```{r, cache = TRUE}
+# Store the significant OTU names as objects
+ds2_signif <- rownames(sigtab)
+corn_signif <- corn_output$significant_taxa
+
+# Get names in ds2_signif that are not in corn_signif
+setdiff(ds2_signif, corn_signif)
+```
+
+Let's examine the first, OTU58. First, we will fit the model for this OTU individually, then we will plot it.
+
+```{r, cache = TRUE}
+mod58 <- bbdml(formula = taxon58 ~ DIAGNOSIS,
+               phi.formula = ~ DIAGNOSIS,
+               data = kostic)
+plot(mod58, color = "DIAGNOSIS", B=0) + ggplot2::theme(axis.text.x = ggplot2::element_blank())
+```
+
+Next, we will examine the taxa that `corncob` finds significance and `DESeq2` does not. We will fit and plot the model in the same way.
+
+```{r, cache = TRUE}
+# Get names in corn_signif that are not in ds2_signif
+setdiff(corn_signif, ds2_signif)
+
+mod264 <- bbdml(formula = taxon264 ~ DIAGNOSIS,
+                phi.formula = ~ DIAGNOSIS,
+                data = kostic)
+plot(mod264, color = "DIAGNOSIS", B=0) + ggplot2::theme(axis.text.x = ggplot2::element_blank())
+```
+
+Unfortunately, because this is real data, there is no way to know the ``truth'' about whether this taxon is truly differentially abundant or not. You can examine these plot, or generate similar plots from the other non-overlapping taxa, and decide whether you think a model should have identified differential abundance or not.
+
