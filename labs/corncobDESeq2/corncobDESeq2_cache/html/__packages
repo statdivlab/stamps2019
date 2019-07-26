@@ -1,0 +1,15 @@
+base
+corncob
+BiocGenerics
+S4Vectors
+IRanges
+GenomeInfoDb
+GenomicRanges
+Biobase
+matrixStats
+BiocParallel
+DelayedArray
+SummarizedExperiment
+DESeq2
+phyloseq
+dplyr
