@@ -34,7 +34,7 @@ download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/la
 ```
 file.show("~/statdivlab/corncob_tutorial.html")
 ```
-## To begin the `corncob` and metagenomics tutorial
+## To begin the `corncob` and shotgun metagenomics tutorial
 ```
 file.show("~/statdivlab/corncob_metagenome.html")
 ```
