@@ -6,8 +6,15 @@ This folder contains the [statdivlab](http://statisticaldiversitylab.com)'s teac
 
 - Lecture: see `estimation-lecture.pdf` above
 - Lab:
-  - We will be doing the lab on Jetstream. More details coming soon...
-  - Click [here](https://github.com/statdivlab/stamps2019/tree/master/labs) to access some materials.
+  - Open your cloud RStudio server as we have done before by finding your name on [this page](https://hackmd.io/@astrobiomike/stamps2019) and clicking the link for RStudio.
+  - When you're in RStudio, copy and paste the following code block to run these commands in order to get all the tutorials and data needed.
+```
+download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/corncob_tutorial/corncob_tutorial.html", corncob_tutorial.html)
+download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/corncobDESeq2/corncobDESeq2.html", corncobDESeq2.html)
+download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/diversity-lab.html", "diversity-lab.html")
+download.file("")
+```
+
 
 # Resources
 

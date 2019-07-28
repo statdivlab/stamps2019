@@ -198,8 +198,6 @@ plot(water_order %>% sample_shannon,
      col = "SampleType") + ylim(0, 3.5)
 ```
 
-You will notice that the estimates are almost the same as previously, but the error bars differ significantly i.e., **there are error bars**
-
 The error bars were the same as previously because we haven't told DivNet anything about the experimental design. Here we observed 4 different water systems, so we will add this as a covariate
 ```{r, cache = TRUE, message = FALSE, warning = FALSE, results = 'hide'} 
 dv_water_st <- divnet(water_order, X = "SampleType", ncores = 8)
@@ -258,4 +256,4 @@ simplifyBeta(dv_water_st, water_order, "bray-curtis", "SampleType") %>%
   xlab("") + ylab("Estimates of Bray-Curtis distance")
 ```
 
-Finally, a teaser! Soon we will have support for phylodivnet(), to estimate UniFrac in the presence of a network. Subscribe to our github for updates. www.github.com/statdivlab/
+Finally, a teaser! Soon we will have support for `phylodivnet()`, to estimate UniFrac in the presence of a network. Subscribe to our github for updates. www.github.com/statdivlab/
