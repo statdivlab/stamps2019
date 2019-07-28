@@ -2,10 +2,10 @@
 
 This folder contains the [statdivlab](http://statisticaldiversitylab.com)'s teaching materials for Sunday's lecture on estimating relative abundance and diversity.
 
-# Details
+# Lecture
+Please refer to the `estimation-lecture.pdf` above
 
-- Lecture: see `estimation-lecture.pdf` above
-- Lab:
+# Tutorials
   - Open your cloud RStudio server as we have done before by finding your name on [this page](https://hackmd.io/@astrobiomike/stamps2019) and clicking the link for RStudio.
   - When you're in RStudio, copy and paste the following code block to run these commands in order to get all the tutorials and data needed in a folder called `statdivlab`
 ```
@@ -21,19 +21,19 @@ download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/la
 
 ## To begin the `corncob` tutorial
 ```
-file.show("corncob_tutorial.html")
+file.show("~/statdivlab/corncob_tutorial.html")
 ```
 ## To begin the `corncob` vs. `DESeq2` tutorial
 ```
-file.show("corncobDESeq2.html")
+file.show("~/statdivlab/corncobDESeq2.html")
 ```
 ## To begin the `corncob` and metagenomes tutorial
 ```
-file.show("corncobmetagenome.html")
+file.show("~/statdivlab/corncobmetagenome.html")
 ```
 ## To begin the diversity estimation tutorial
 ```
-file.show("diversity-lab.html")
+file.show("~/statdivlab/diversity-lab.html")
 ```
 
 # Resources
