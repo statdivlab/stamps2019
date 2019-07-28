@@ -23,13 +23,13 @@ download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/la
 ```
 file.show("~/statdivlab/corncob_tutorial.html")
 ```
-## To begin the `corncob` vs. `DESeq2` tutorial
-```
-file.show("~/statdivlab/corncobDESeq2.html")
-```
 ## To begin the `corncob` and metagenomes tutorial
 ```
 file.show("~/statdivlab/corncobmetagenome.html")
+```
+## To begin the `corncob` vs. `DESeq2` tutorial
+```
+file.show("~/statdivlab/corncobDESeq2.html")
 ```
 ## To begin the diversity estimation tutorial
 ```
