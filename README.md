@@ -16,25 +16,34 @@ The [Stat Div Lab](http://statisticaldiversitylab.com/) is a group of badass sta
 The Statistical Diversity Lab is the research group of Amy Willis. The Stat Div Lab develops rigorous statistical methods for the analysis of microbiome data. We are excited to be at STAMPS teaching `Statistics Bootcamp`, and `Statistical Estimation`. We are typically very opinionated, though, so feel free to chat to us about anything!
 
 # Tutorials
-### Corncob Tutorial (R markdown and html file)
+- Open your cloud RStudio server as we have done before by finding your name on [this page](https://hackmd.io/@astrobiomike/stamps2019) and clicking the link for RStudio.
+- When you're in RStudio, copy and paste the following code block to run these commands in order to get all the tutorials and data needed in a folder called `statdivlab`
 ```
-download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/corncob_tutorial/corncob_tutorial.Rmd", "corncob_tutorial.Rmd")
-
-download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/corncob_tutorial/corncob_tutorial.html", corncob_tutorial.html)
+setwd("~/")
+dir.create("~/statdivlab/")
+setwd("~/statdivlab/")
+download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/corncob_tutorial/corncob_tutorial.html", destfile = "corncob_tutorial.html")
+download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/corncobDESeq2/corncobDESeq2.html", destfile = "corncobDESeq2.html")
+download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/diversity-lab.html", destfile = "diversity-lab.html")
+download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/data/count_data.csv", destfile = "count_data.csv")
+download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/data/sample_data.csv", destfile = "sample_data.csv")
 ```
 
-### Corncob and DESeq2 Tutorial (R markdown and html file)
+## To begin the `corncob` tutorial
 ```
-download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/corncobDESeq2/corncobDESeq2.Rmd", "corncobDESeq2.Rmd")
-
-download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/corncobDESeq2/corncobDESeq2.html", corncobDESeq2.html)
+file.show("~/statdivlab/corncob_tutorial.html")
 ```
-
-### Diversity Estimation Tutorial (R markdown and html file)
+## To begin the `corncob` and metagenomes tutorial
 ```
-download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/diversity-lab.Rmd", "diversity-lab.Rmd")
-
-download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/diversity-lab.html", "diversity-lab.html")
+file.show("~/statdivlab/corncobmetagenome.html")
+```
+## To begin the `corncob` vs. `DESeq2` tutorial
+```
+file.show("~/statdivlab/corncobDESeq2.html")
+```
+## To begin the diversity estimation tutorial
+```
+file.show("~/statdivlab/diversity-lab.html")
 ```
 
 # Questions
