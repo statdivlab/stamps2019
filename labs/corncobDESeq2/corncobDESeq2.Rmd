@@ -20,7 +20,7 @@ Next, we'll get results from DESeq2, following the tutorial (updating one part w
 
 I will re-name the taxa using the corncob function `clean_taxa_names()`. This is just to make the taxa names more human readable. We will use a significance cutoff of 0.05.  
 
-```{r, cache = TRUE, message = FALSE, warning = FALSE, echo = FALSE, results = 'hide'}
+```{r, cache = TRUE, message = FALSE, warning = FALSE, results = 'hide'}
 
 kostic <- system.file("extdata",
                       "study_1457_split_library_seqs_and_mapping.zip",

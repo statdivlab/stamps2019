@@ -388,6 +388,24 @@ library(phyloseq)
 library(dplyr)</code></pre>
 <p>Next, we’ll get results from DESeq2, following the tutorial (updating one part which is deprecated at the link above but available in the package vignette). We will be examining and comparing the microbiomes of individuals with and without colorectal cancer. Specifically, we will be testing for differential abundance across all 2505 taxa.</p>
 <p>I will re-name the taxa using the corncob function <code>clean_taxa_names()</code>. This is just to make the taxa names more human readable. We will use a significance cutoff of 0.05.</p>
+<pre class="r"><code>kostic &lt;- system.file(&quot;extdata&quot;,
+                      &quot;study_1457_split_library_seqs_and_mapping.zip&quot;,
+                      package=&quot;phyloseq&quot;) %&gt;% 
+  microbio_me_qiime %&gt;%
+  subset_samples(DIAGNOSIS != &quot;None&quot;) %&gt;%
+  corncob::clean_taxa_names(name = &quot;taxon&quot;)
+
+diagdds = phyloseq_to_deseq2(kostic, ~ DIAGNOSIS)
+# calculate geometric means prior to estimate size factors
+gm_mean = function(x, na.rm=TRUE){
+  exp(sum(log(x[x &gt; 0]), na.rm=na.rm) / length(x))
+}
+geoMeans = apply(counts(diagdds), 1, gm_mean)
+diagdds = estimateSizeFactors(diagdds, geoMeans = geoMeans)
+diagdds = DESeq(diagdds,test=&quot;Wald&quot;, fitType=&quot;parametric&quot;)
+res = results(diagdds, cooksCutoff = FALSE)
+sigtab = res[which(res$padj &lt; 0.05), ]
+sigtab = cbind(as(sigtab, &quot;data.frame&quot;), as(tax_table(kostic)[rownames(sigtab), ], &quot;matrix&quot;))</code></pre>
 <p>We can see the results by looking at <code>sigtab</code>. Let’s look at the first 5 rows.</p>
 <pre class="r"><code>sigtab[1:5,]</code></pre>
 <pre><code>##            baseMean log2FoldChange     lfcSE      stat        pvalue
