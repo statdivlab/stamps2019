@@ -110,3 +110,16 @@ ggplot(my_gene, aes(x = BMI, y = Counts)) +
 ```
 
 Here, we can see that we have only three non-zero counts, all at above average BMI. In this case, we have an outlier, which also happens to be the sample in which we observed a high count for this gene. Thus, in this case, we probably wouldn't (and shouldn't) consider it biologically useful. Thus, for this data set, we might conclude that BMI doesn't explain gene abundances.
+
+So, perhaps there is nothing to see here! However, this matches what we know about the human gut microbiome. Diet is a major driver of composition of the human gut microbiome [1]. Diet is such a strong predictor of gut microbiome composition that it has been demonstrated that it shapes similar microbiomes across mammalian lineages [2].
+
+The population that we studied here is local people in rainforested areas of north-eastern Madagascar (near the city of Maroantsetra) with a very unique diet. The population is nearly a fully autarchic food production system.  They hunt and gather wild harvest foods that the forests and rivers provide, as well as practice agriculture for rice production. Wild meats they consume include lemurs, bats, carnivores, tenrecs.  Because market access is nearly non-existent and domesticated meats are a rare luxury in this region, wild meats provide crucial micronutrients that are otherwise unavailable in the diet.
+
+We also only looked at one species that was prevalent across many samples. The gut microbiome is composed of many more; one of these that we did not test might have an impact.
+
+### Citations
+[[1]](https://www.nature.com/articles/nature12820?ref=vc.ru)
+
+[[2]](https://science.sciencemag.org/content/332/6032/970)
+
+[cohort paper](https://academic.oup.com/ije/article/46/6/1747/3868352)
