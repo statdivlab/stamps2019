@@ -1,6 +1,6 @@
 ---
-title: "corncob for metagenomic"
-author: "Bryan D Martin"
+title: "corncob for gene abundance from shotgun data"
+author: "Bryan D Martin, Taylor Reiter, Pauline Trinh, Amy Willis"
 output: html_document
 ---
 
@@ -16,6 +16,8 @@ library(dplyr)
 library(corncob)
 library(ggplot2)
 ```
+
+This tutorial is based on the data from [these slides](https://github.com/statdivlab/stamps2019/blob/master/estimation/estimation-lecture.pdf) (roughly slides 63 - 68).
 
 ## Creating a phyloseq object
 

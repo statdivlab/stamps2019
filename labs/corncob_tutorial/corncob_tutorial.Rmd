@@ -67,7 +67,7 @@ Our covariates are as follows:
 
 
 - `Plants`: Indicator of whether plants are in the soil for this sample.
-- `Amdmt`: Categorical variable representing one of three soil additives; none, biochar, and freshbiomass, respectively.
+- `Amdmt`: Categoircal variable representing one of three soil additives; none, biochar, and freshbiomass, respectively.
 - `ID`: Categorical variable representing different plots of soil.
 - `Day`: Categorical variable representing one of three days of measurement; day 1, day 21, and day 81, respectively.
 - `DayAmdmt`: Categorical variable combining the `Day` and `Amdmt` variables into a single variable.

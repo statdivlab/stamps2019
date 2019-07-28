@@ -1,6 +1,6 @@
 ---
 title: "corncob and DESeq2"
-author: "Bryan Martin"
+author: "Bryan D Martin"
 output: html_document
 ---
 
