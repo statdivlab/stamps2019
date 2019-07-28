@@ -1,0 +1,110 @@
+---
+title: "corncob for metagenomic"
+author: "Bryan D Martin"
+output: html_document
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(fig.width=9, fig.height=4) 
+```
+
+
+```{r, message = FALSE}
+library(readr)
+library(phyloseq)
+library(dplyr)
+library(corncob)
+library(ggplot2)
+```
+
+## Creating a phyloseq object
+
+First, let's take the raw data and transform it into `phyloseq` objects. This isn't strictly necessary for using `corncob` (we can also just use `data.frame` or `matrix` objects), but it will allow us to generalize our workflow as much as possible and create data in the nice `phyloseq` form. First, we'll load the data.
+
+```{r load, cache = TRUE, results = 'hide', warning = FALSE, message = FALSE}
+download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/data/count_data.csv", "count_data.csv")
+count_data <- read_csv("./count_data.csv")
+
+download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/data/sample_data.csv", "sample_data.csv")
+sample_data <- read_csv("./sample_data.csv")
+```
+
+
+Next, let's look at the data to make sure it is in the format we want.
+
+```{r}
+# View the data, in console
+# count_data
+```
+
+We can see that the first column is actually the names, not count data. Further, the "taxa" (in this case, the genes) are the rows. So to extract the actually count data, we will remove the first column, use `dplyr::pull` to extract it and store it as the `taxa_names` for our object.
+
+```{r, cache = TRUE}
+# remove the first column, set taxa as rows
+my_counts <- otu_table(count_data[,-1], taxa_are_rows = TRUE)
+# Pull out the gene ID to use as "taxa" names
+taxa_names(my_counts) <- count_data %>% pull(X1)
+```
+
+Now let's go through the same process for the sample data. This time, the extra column represents the `sample_names`. We'll make sure to distinguish this from `taxa_names` when creating our object. 
+
+```{r}
+# View the data, in console
+# sample_data
+```
+
+While we could trim a lot of information here for the purposes of this tutorial, let's just pretend we only want to get rid of some of the identification variables. In this case, we will remove the first three columns, and store the second column as our `sample_names`.
+
+```{r, cache = TRUE}
+# Remove first three columns
+my_samp <- sample_data(sample_data[,-c(1:3)])
+# Pull out the sample ID to use as sample names
+# Note that I have to use the original data, 
+# as I removed this column from my_samp
+sample_names(my_samp) <- sample_data %>% pull(sampleID)
+```
+
+Now, to create a basic `phyloseq` object, we just tell it to combine these objects. `phyloseq` will automatically make sure that our sample names and taxa names match, so if we have an extra row or column and the data sets aren't trivially combined, it will warn us. This can be a pain, but it is much, much better than accidentally using data that doesn't represent what we think it does.
+
+```{r, cache = TRUE}
+mahery <- phyloseq(my_counts, my_samp)
+mahery
+```
+
+## Using corncob
+
+For purposes of this tutorial, we will test for differential abundance across `BMI`, controlling for the effect of `Sex` on the mean relative abundance, and controlling for the effect of both `Sex` and `BMI` on the dispersion of the relative abundances. For a more detailed explaination of how we take models such as this and translate them into `corncob`, see `corncob_tutorial`.
+
+```{r difTest, cache = TRUE}
+my_output <- differentialTest(formula = ~ Sex*BMI,
+                              formula_null = ~ Sex,
+                              phi.formula = ~ 1,
+                              phi.formula_null = ~ 1,
+                              data = mahery, 
+                              test = "Wald", boot = FALSE)
+```
+
+Let's investigate the significant genes.
+
+```{r}
+my_output$significant_taxa
+```
+
+In this case, we only have one. That's fine! Let's plot the data for this gene, ordered by BMI.
+
+```{r, cache = TRUE}
+# subset the gene counts
+all_counts <- as.matrix(phyloseq::otu_table(mahery)@.Data)
+my_gene_counts <- all_counts["A47_02_1FE__bin.11_00187",]
+# subset the BMI data
+all_samp <- as.data.frame(phyloseq::sample_data(mahery))
+my_BMI <- all_samp$BMI
+my_gene <- data.frame(cbind(Counts = my_gene_counts,
+                            BMI = my_BMI,
+                            Sample_ID = 1:110))
+ggplot(my_gene, aes(x = BMI, y = Counts)) +
+  geom_point() +
+  theme_bw()
+```
+
+Here, we can see that we have only three non-zero counts, all at above average BMI. In this case, we have an outlier, which also happens to be the sample in which we observed a high count for this gene. Thus, in this case, we probably wouldn't (and shouldn't) consider it biologically useful. Thus, for this data set, we might conclude that BMI doesn't explain gene abundances.
