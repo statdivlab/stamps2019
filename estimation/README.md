@@ -6,26 +6,27 @@ This folder contains the [statdivlab](http://statisticaldiversitylab.com)'s teac
 Please refer to the `estimation-lecture.pdf` above
 
 # Tutorials
-  - Open your cloud RStudio server as we have done before by finding your name on [this page](https://hackmd.io/@astrobiomike/stamps2019) and clicking the link for RStudio.
-  - When you're in RStudio, copy and paste the following code block to run these commands in order to get all the tutorials and data needed in a folder called `statdivlab`
+- Open your cloud RStudio server as we have done before by finding your name on [this page](https://hackmd.io/@astrobiomike/stamps2019) and clicking the link for RStudio.
+- When you're in RStudio, copy and paste the following code block to run these commands in order to get all the tutorials and data needed in a folder called `statdivlab`
 ```
 setwd("~/")
 dir.create("~/statdivlab/")
 setwd("~/statdivlab/")
 download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/corncob_tutorial/corncob_tutorial.html", destfile = "corncob_tutorial.html")
 download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/corncobDESeq2/corncobDESeq2.html", destfile = "corncobDESeq2.html")
+download.file("https://github.com/statdivlab/stamps2019/blob/master/labs/corncob_metagenome/corncob_metagenome.html", destfile = "corncob_metagenome.html")
 download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/diversity-lab.html", destfile = "diversity-lab.html")
-download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/data/count_data.csv", destfile = "count_data.csv")
-download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/data/sample_data.csv", destfile = "sample_data.csv")
+download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/corncob_metagenome/count_data.csv", destfile = "count_data.csv")
+download.file("https://raw.githubusercontent.com/statdivlab/stamps2019/master/labs/corncob_metagenome/sample_data.csv", destfile = "sample_data.csv")
 ```
 
 ## To begin the `corncob` tutorial
 ```
 file.show("~/statdivlab/corncob_tutorial.html")
 ```
-## To begin the `corncob` and metagenomes tutorial
+## To begin the `corncob` and shotgun metagenomics tutorial
 ```
-file.show("~/statdivlab/corncobmetagenome.html")
+file.show("~/statdivlab/corncob_metagenome.html")
 ```
 ## To begin the `corncob` vs. `DESeq2` tutorial
 ```
